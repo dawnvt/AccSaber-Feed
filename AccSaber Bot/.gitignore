@@ -1,0 +1,10 @@
+# DO NOT commit the token.env, its the token for the bot.
+*.env
+
+# not committing these, as it isnt necessary
+bin/**
+obj/**
+
+# no need to commit the Visual Studio folder.
+.vs
+
