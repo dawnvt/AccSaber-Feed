@@ -8,6 +8,7 @@ using System.Net.WebSockets;
 using Discord;
 using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
+using Logging;
 
 namespace AccSaber_Feed
 {
@@ -17,12 +18,6 @@ namespace AccSaber_Feed
                => new Program().MainAsync().GetAwaiter().GetResult();
 
         private DiscordSocketClient _client;
-
-        private Task Log(LogMessage msg)
-        {
-            Console.WriteLine(msg.ToString());
-            return Task.CompletedTask;
-        }
 
         public async Task MainAsync()
         {
@@ -35,7 +30,9 @@ namespace AccSaber_Feed
                     .Build();
 
             _client = new DiscordSocketClient();
-            _client.Log += Log;
+            _client.Log += LoggingService.LogAsync;
+
+           // new LoggingService(_client, null);
 
             var token = Environment.GetEnvironmentVariable("token");
 
