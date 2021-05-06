@@ -9,10 +9,10 @@ namespace AccSaber_Feed
         public static void Load(string filePath)
         {
             if (!File.Exists(filePath))
-                {
+            {
                 Console.WriteLine("File does not exist.");
                 return;
-                }
+            }
                 
 
             foreach (var line in File.ReadAllLines(filePath))

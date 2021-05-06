@@ -18,4 +18,8 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="CommandHandler.cs" />
+  </ItemGroup>
+
 </Project>

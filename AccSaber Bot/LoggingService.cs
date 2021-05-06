@@ -6,12 +6,13 @@ using Discord.Commands;
 using Discord.WebSocket;
 
 
+
 namespace Logging
 {
     public class LoggingService
     {
 
-        // DEPENDENCY INJECTION IN CONTRUCTOR
+        // DEPENDENCY INJECTION IN CONSTRUCTOR
         public LoggingService(DiscordSocketClient _client, CommandService _command)
         {
             _client.Log += LogAsync;
