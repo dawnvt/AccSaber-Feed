@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using AccSaber_Feed;
 
 
 
@@ -13,10 +14,10 @@ namespace Logging
     {
 
         // DEPENDENCY INJECTION IN CONSTRUCTOR
-        public LoggingService(DiscordSocketClient _client, CommandService _command)
+        public LoggingService(DiscordSocketClient client, CommandService command)
         {
-            _client.Log += LogAsync;
-            _command.Log += LogAsync;
+            client.Log += LogAsync;
+            command.Log += LogAsync;
         }
 
         // CLASS METHODS
