@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net.WebSockets;
 using System.Threading.Channels;
+using AccSaber_Bot;
 using Discord;
 using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
@@ -47,10 +48,22 @@ namespace AccSaber_Feed
         public async Task MessageReceivedHandler(SocketMessage msg)
         {
             var usermsg = msg as IUserMessage;
-            if (usermsg == null) return;
+            if (usermsg == null || msg.Author.IsBot) return;
 
-            Emote emote = Emote.Parse("<:sealacc:839828809871130664>");
-            await msg.AddReactionAsync(emote);
+            if (msg.Content.Contains("115"))
+            {
+                if (Emote.TryParse(AccBotEmotes.SealAcc, out var emote))
+                {
+                    await msg.AddReactionAsync(emote);
+                }
+            }
+        }
+
+        public async Task SendMessage(ISocketMessageChannel channel, String message)
+        {
+            var enterTypingState = channel.EnterTypingState();
+            await channel.SendMessageAsync(message);
+            enterTypingState.Dispose();
         }
     }
 }
