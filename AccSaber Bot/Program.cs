@@ -1,18 +1,13 @@
 ﻿using System;
 using System.IO;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.ComponentModel.Design;
 using System.Threading.Tasks;
-using System.Net.WebSockets;
-using System.Threading.Channels;
+using System.Reflection;
 using AccSaber_Bot;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Logging;
 
 namespace AccSaber_Feed
 {
@@ -21,9 +16,55 @@ namespace AccSaber_Feed
         static void Main(string[] args)
             => new Program().MainAsync().GetAwaiter().GetResult();
 
-        public DiscordSocketClient _client;
-        public CommandService _commands;
+        public class Initialize
+        {
+            private readonly DiscordSocketClient _client;
+            private readonly CommandService _commands;
+            
+            public Initialize(CommandService commands = null, DiscordSocketClient = null)
+            {
+                _commands = commands ?? new CommandService();
+                _client = client ?? new DiscordSocketClient();
+            }
 
+            public IServiceProvider BuildServiceProvider()
+                => new ServiceContainer()
+                    .AddSingleton(_client)
+                    .AddSinglton(_commands)
+                    .AddSingleton<CommandHandler>
+                    .BuildServiceProvider();
+        }
+
+        public class CommandHandler
+        {
+            private readonly DiscordSocketClient _client;
+            private readonly CommandService _commands;
+            private readonly IServiceProvider _services;
+
+            public CommandHandler(IServiceProvider services, CommandService commands, DiscordSocketClient client)
+            {
+                _commands = commands;
+                _client = client;
+                _services = services;
+            }
+
+            public async Task InitializeAsync()
+            {
+                await _commands.AddModulesAsync(
+                    assembly: Assembly.GetEntryAssembly(), 
+                    services: _services);
+                _client.MessageReceived += HandleCommandAsync;
+            }
+
+            public async Task HandleCommandAsync(SocketMessage msg)
+            {
+                await _commands.ExecuteAsync(
+                    context: context, 
+                    argPos: argPos, 
+                    services: _services);
+            }
+        }
+        
         public async Task MainAsync()
         {
             var root = Directory.GetCurrentDirectory();
@@ -34,18 +75,18 @@ namespace AccSaber_Feed
                 new ConfigurationBuilder()
                     .Build();
 
-            _client = new DiscordSocketClient();
+            /* _client = new DiscordSocketClient();
             _client.Log += LoggingService.LogAsync;
             _client.MessageReceived += MessageReceivedHandler;
 
-            new LoggingService(_client, _commands);
+            new LoggingService(client, commands);
 
             var token = Environment.GetEnvironmentVariable("token");
 
             await _client.LoginAsync(TokenType.Bot, token);
             await _client.StartAsync();
 
-            await Task.Delay(-1);
+            await Task.Delay(-1); */
         }
 
         public async Task MessageReceivedHandler(SocketMessage msg)
